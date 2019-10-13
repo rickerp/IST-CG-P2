@@ -1,14 +1,14 @@
-import Bullet from "./Bullet.js"
+import Bullet from './Bullet.js';
 
-export default class Cannon{
+export default class Cannon {
     object = null;
     barrel = null;
     shootingPos = null;
-    
-    constructor(x, y ,z){
+
+    constructor(x, y, z) {
         this.object = new THREE.Object3D();
         this.material = new THREE.MeshBasicMaterial({
-            wireframe: false
+            wireframe: false,
         });
 
         this.createBase(0, 1, 0);
@@ -22,11 +22,11 @@ export default class Cannon{
         this.object.position.set(x, y, z);
     }
 
-    createBase(x, y, z){
+    createBase(x, y, z) {
         let geometry = new THREE.CubeGeometry(20, 2, 10);
         let material = new THREE.MeshBasicMaterial({
             wireframe: false,
-            color: 0x993e14
+            color: 0x993e14,
         });
 
         let mesh = new THREE.Mesh(geometry, material);
@@ -35,30 +35,29 @@ export default class Cannon{
         this.object.add(mesh);
     }
 
-    createBarrel(x, y, z){
-        let geometry = new THREE.CylinderGeometry(4,4,20,32);
+    createBarrel(x, y, z) {
+        let geometry = new THREE.CylinderGeometry(4, 4, 20, 32);
         let material = new THREE.MeshBasicMaterial({
             wireframe: false,
-            color: 0x808080
+            color: 0x808080,
         });
 
         let mesh = new THREE.Mesh(geometry, material);
         this.barrel = mesh;
-        this.rotateBarrel(Math.PI/2);
+        this.rotateBarrel(Math.PI / 2);
         mesh.position.set(x, y, z);
         this.object.add(mesh);
     }
 
-    rotateBarrel(value){
+    rotateBarrel(value) {
         this.barrel.rotateZ(value);
     }
 
-    shootBullet(){
+    shootBullet() {
         return new Bullet(
-            this.shootingPos.position.x, 
+            this.shootingPos.position.x,
             this.shootingPos.position.y,
             this.shootingPos.position.z
-            );
-
+        );
     }
 }

@@ -1,8 +1,8 @@
-import Cannon from "./Cannon.js"
-import Bullet from "./Bullet.js";
-import Wall from "./Wall.js";
+import Cannon from './Cannon.js';
+import Bullet from './Bullet.js';
+import Wall from './Wall.js';
 
-export default class { 
+export default class {
     renderer = null;
     scene = null;
     cannon = null;
@@ -14,7 +14,7 @@ export default class {
 
     constructor() {
         this.renderer = new THREE.WebGLRenderer({
-            antialias: false
+            antialias: false,
         });
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -25,13 +25,13 @@ export default class {
         this.createCamera(70, 20, 0, 1);
         this.createCamera(0, 0, 50, 1);
         this.camera = this.cameras[0];
-        
-        this.createCannon(0, 0, 0)
 
-        window.addEventListener("keydown", this.onKeyDown.bind(this));
-        window.addEventListener("keyup", this.onKeyUp.bind(this));
+        this.createCannon(0, 0, 0);
 
-        window.addEventListener("resize", this.onResize.bind(this));
+        window.addEventListener('keydown', this.onKeyDown.bind(this));
+        window.addEventListener('keyup', this.onKeyUp.bind(this));
+
+        window.addEventListener('resize', this.onResize.bind(this));
 
         this.animate(this.lastTimestamp);
     }
@@ -42,7 +42,7 @@ export default class {
     }
 
     createCamera(x, y, z, type) {
-        if(type == 0)
+        if (type == 0)
             var camera = new THREE.OrthographicCamera(
                 window.innerWidth / -18,
                 window.innerWidth / 18,
@@ -51,19 +51,20 @@ export default class {
                 -200,
                 500
             );
-            
-        else if(type == 1)
-            var camera = new THREE.PerspectiveCamera(70,
+        else if (type == 1)
+            var camera = new THREE.PerspectiveCamera(
+                70,
                 window.innerWidth / window.innerHeight,
                 1,
-                1000);
+                1000
+            );
 
         camera.position.set(x, y, z);
         camera.lookAt(this.scene.position);
         this.cameras.push(camera);
     }
-    
-    createCannon(x, y, z){
+
+    createCannon(x, y, z) {
         this.cannon = new Cannon(x, y, z);
         this.scene.add(this.cannon.object);
     }
@@ -80,7 +81,6 @@ export default class {
     onKeyUp(e) {
         this.keys[e.keyCode] = false; // keys left, up, right and down handled here
         switch (e.keyCode) {
-            
         }
     }
 
@@ -109,9 +109,7 @@ export default class {
         this.renderer.render(this.scene, this.camera);
     }
 
-    update(delta) {
-
-    }
+    update(delta) {}
 
     animate(ts) {
         let delta = (ts - this.lastTimestamp) / 1000;
