@@ -53,7 +53,7 @@ export default class Cannon {
 		this.barrel.rotateZ(value);
 	}
 
-	shootBullet() {
+	createBullet() {
 		return new Bullet(
 			this.shootingPos.position.x,
 			this.shootingPos.position.y,
