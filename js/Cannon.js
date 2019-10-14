@@ -43,14 +43,15 @@ export default class Cannon {
 		});
 
 		let mesh = new THREE.Mesh(geometry, material);
-		this.barrel = mesh;
-		this.rotateBarrel(Math.PI / 2);
+		this.barrel = new THREE.Object3D();
+		mesh.rotateZ(Math.PI / 2);
 		mesh.position.set(x, y, z);
-		this.object.add(mesh);
+		this.barrel.add(mesh);
+		this.object.add(this.barrel);
 	}
 
 	rotateBarrel(value) {
-		this.barrel.rotateZ(value);
+		this.barrel.rotateY(value);	
 	}
 
 	createBullet() {
