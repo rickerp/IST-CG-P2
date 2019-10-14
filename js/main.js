@@ -3,166 +3,164 @@ import Cannon from './Cannon.js';
 import Bullet from './Bullet.js';
 import Fence from './Fence.js';
 
-export default class main {
-	renderer = null;
-	scene = null;
-	
-	keys = {};
-	cameras = [];
+var renderer = null;
+var scene = null;
 
-	cannons = [];
-	cannon = null;
-	barrelRotationSpeed = 1.5;	
-	sideRotation = 0;
+var keys = {};
+var cameras = [];
+var camera = null;
 
-	lastTimestamp = 0;
+var cannons = [];
+var cannon = null;
+var barrelRotationSpeed = 1.5;
+var sideRotation = 0;
 
-	constructor() {
-		this.renderer = new THREE.WebGLRenderer({
-			antialias: false,
-		});
+var lastTimestamp = 0;
 
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		document.body.appendChild(this.renderer.domElement);
+function init() {
+	renderer = new THREE.WebGLRenderer({
+		antialias: false,
+	});
 
-		this.createScene();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	document.body.appendChild(renderer.domElement);
 
-		this.cameras[0] = this.createCamera(0, 100, 0, 0);
-		this.cameras[1] = this.createCamera(70, 20, 0, 1);
-		this.cameras[2] = this.createCamera(0, 0, 50, 1);
-		this.camera = this.cameras[0];
+	createScene();
 
-		this.cannons[0] = this.createCannon(30, 0, -30);
-		this.cannons[1] = this.createCannon(30, 0, 0);
-		this.cannons[2] = this.createCannon(30, 0, 30);
-		this.selectCannon(0);
+	cameras[0] = createCamera(0, 100, 0, 0);
+	cameras[1] = createCamera(70, 20, 0, 1);
+	cameras[2] = createCamera(0, 0, 50, 1);
+	camera = cameras[0];
 
-		window.addEventListener('keydown', this.onKeyDown.bind(this));
-		window.addEventListener('keyup', this.onKeyUp.bind(this));
+	cannons[0] = createCannon(30, 0, -30);
+	cannons[1] = createCannon(30, 0, 0);
+	cannons[2] = createCannon(30, 0, 30);
+	selectCannon(0);
 
-		window.addEventListener('resize', this.onResize.bind(this));
+	window.addEventListener('keydown', onKeyDown);
+	window.addEventListener('keyup', onKeyUp);
 
-		this.animate(this.lastTimestamp);
+	window.addEventListener('resize', onResize);
+
+	animate(lastTimestamp);
+}
+
+function createScene() {
+	scene = new THREE.Scene();
+	scene.add(new THREE.AxisHelper(10));
+}
+
+function createCamera(x, y, z, type) {
+	if (type === 0) {
+		var camera = new THREE.OrthographicCamera(
+			window.innerWidth / -18,
+			window.innerWidth / 18,
+			window.innerHeight / 18,
+			window.innerHeight / -18,
+			-200,
+			500
+		);
+	} else if (type === 1) {
+		var camera = new THREE.PerspectiveCamera(
+			70,
+			window.innerWidth / window.innerHeight,
+			1,
+			1000
+		);
 	}
 
-	createScene() {
-		this.scene = new THREE.Scene();
-		this.scene.add(new THREE.AxisHelper(10));
-	}
+	camera.position.set(x, y, z);
+	camera.lookAt(scene.position);
+	return camera;
+}
 
-	createCamera(x, y, z, type) {
-		if (type === 0) {
-			var camera = new THREE.OrthographicCamera(
-				window.innerWidth / -18,
-				window.innerWidth / 18,
-				window.innerHeight / 18,
-				window.innerHeight / -18,
-				-200,
-				500
-			);
-		} else if (type === 1) {
-			var camera = new THREE.PerspectiveCamera(
-				70,
-				window.innerWidth / window.innerHeight,
-				1,
-				1000
-			);
-		}
+function createCannon(x, y, z) {
+	let cannon = new Cannon(x, y, z);
+	scene.add(cannon.object);
+	return cannon;
+}
 
-		camera.position.set(x, y, z);
-		camera.lookAt(this.scene.position);
-		return camera;
-	}
+function selectCannon(n) {
+	cannon = cannons[n];
+	cannon.barrel.children[0].material.color.setHex(0xffffff);
+}
 
-	createCannon(x, y, z) {
-		let cannon = new Cannon(x, y, z);
-		this.scene.add(cannon.object);
-		return cannon;
-	}
+function rotateSelectedCannon(angle) {
+	cannon.rotateBarrel(angle);
+}
 
-	selectCannon(n) {
-		this.cannon = this.cannons[n];
-		this.cannon.barrel.children[0].material.color.setHex(0xffffff);
-	}
+function onResize() {
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	camera.left = -window.innerWidth / 18;
+	camera.right = window.innerWidth / 18;
+	camera.top = window.innerHeight / 18;
+	camera.bottom = -window.innerHeight / 18;
+	camera.updateProjectionMatrix();
+}
 
-	rotateSelectedCannon(angle) {
-		console.log(angle);
-		this.cannon.rotateBarrel(angle);
-	}
-
-	onResize() {
-		this.renderer.setSize(window.innerWidth, window.innerHeight);
-		this.camera.left = -window.innerWidth / 18;
-		this.camera.right = window.innerWidth / 18;
-		this.camera.top = window.innerHeight / 18;
-		this.camera.bottom = -window.innerHeight / 18;
-		this.camera.updateProjectionMatrix();
-	}
-
-	onKeyUp(e) {
-		this.keys[e.keyCode] = false;
-		switch (e.keyCode) {
-			case 37:
-				this.sideRotation = 0;
-				break;
-			case 39:
-				this.sideRotation = 0;
-				break;
-		}	
-	}
-
-	onKeyDown(e) {
-		this.keys[e.keyCode] = true;
-
-		switch (e.keyCode) {
-			case 49: // 1 upper_camera
-				this.camera = this.cameras[0];
-				break;
-			case 50: // 2 perspective_camera
-				this.camera = this.cameras[1];
-				break;
-			case 51: // 3 ball_camera
-				this.camera = this.cameras[2];
-				break;
-			case 81: // q 
-				this.selectCannon(0); 
-				break;
-			case 87: // w
-				this.selectCannon(1);
-				break;
-			case 69: // e
-				this.selectCannon(2);
-				break;
-			case 37: // left arrow
-				this.sideRotation = this.barrelRotationSpeed;
-				break;
-			case 39: // right arrow
-				this.sideRotation = -this.barrelRotationSpeed;
-		}
-	}
-
-	setCameraPosition(x, y, z, n) {
-		this.cameras[n].position.set(x, y, z);
-		this.cameras[n].lookAt(this.scene.position);
-	}
-
-	render() {
-		this.renderer.render(this.scene, this.camera);
-	}
-
-	update(delta) {
-		this.rotateSelectedCannon(this.sideRotation * delta);
-	}
-
-	animate(ts) {
-		let delta = (ts - this.lastTimestamp) / 1000;
-		this.lastTimestamp = ts;
-
-		this.update(delta);
-		this.render();
-
-		requestAnimationFrame(this.animate.bind(this));
+function onKeyUp(e) {
+	keys[e.keyCode] = false;
+	switch (e.keyCode) {
+		case 37:
+			sideRotation = 0;
+			break;
+		case 39:
+			sideRotation = 0;
+			break;
 	}
 }
 
-new main();
+function onKeyDown(e) {
+	keys[e.keyCode] = true;
+
+	switch (e.keyCode) {
+		case 49: // 1 upper_camera
+			camera = cameras[0];
+			break;
+		case 50: // 2 perspective_camera
+			camera = cameras[1];
+			break;
+		case 51: // 3 ball_camera
+			camera = cameras[2];
+			break;
+		case 81: // q
+			selectCannon(0);
+			break;
+		case 87: // w
+			selectCannon(1);
+			break;
+		case 69: // e
+			selectCannon(2);
+			break;
+		case 37: // left arrow
+			sideRotation = barrelRotationSpeed;
+			break;
+		case 39: // right arrow
+			sideRotation = -barrelRotationSpeed;
+	}
+}
+
+function setCameraPosition(x, y, z, n) {
+	cameras[n].position.set(x, y, z);
+	cameras[n].lookAt(scene.position);
+}
+
+function render() {
+	renderer.render(scene, camera);
+}
+
+function update(delta) {
+	rotateSelectedCannon(sideRotation * delta);
+}
+
+function animate(ts) {
+	let delta = (ts - lastTimestamp) / 1000;
+	lastTimestamp = ts;
+
+	update(delta);
+	render();
+
+	requestAnimationFrame(animate);
+}
+
+init();

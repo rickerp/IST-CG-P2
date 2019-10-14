@@ -16,8 +16,8 @@ export default class Cannon {
 
 		this.shootingPos = new THREE.Object3D();
 		this.shootingPos.position.set(-21, 5, 0);
-		// this.shootingPos.add(new THREE.AxesHelper(4));
-		this.object.add(this.shootingPos);
+		this.shootingPos.add(new THREE.AxesHelper(4));
+		this.barrel.add(this.shootingPos);
 
 		this.object.position.set(x, y, z);
 	}
@@ -51,7 +51,7 @@ export default class Cannon {
 	}
 
 	rotateBarrel(value) {
-		this.barrel.rotateY(value);	
+		this.barrel.rotateY(value);
 	}
 
 	createBullet() {
