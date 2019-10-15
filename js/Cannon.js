@@ -17,7 +17,7 @@ export default class Cannon extends THREE.Object3D {
 		this.cannonEnd.add(new THREE.AxesHelper(10));
 		this.cannonEnd.position.set(0, 10, 0);
 
-		this.barrel.add(this.cannonEnd);
+		this.barrel.children[0].add(this.cannonEnd);
 		this.position.set(x, y, z);
 	}
 
@@ -39,18 +39,21 @@ export default class Cannon extends THREE.Object3D {
 			wireframe: false,
 			color: 0x808080,
 		});
-		this.barrel = new THREE.Mesh(geometry, material);
-		this.barrel.rotateZ(Math.PI / 2);
-		this.barrel.position.set(x, y, z);
+		let mesh = new THREE.Mesh(geometry, material);
+		mesh.rotateZ(Math.PI / 2);
+		mesh.position.set(x, y, z);
+
+		this.barrel = new THREE.Object3D();
+		this.barrel.add(mesh);
 		this.add(this.barrel);
 	}
 
 	rotateBarrel(value) {
-		this.barrel.rotateX(value);
+		this.barrel.rotateY(value);
 	}
 
-	changeColor(colorHex) {
-		this.barrel.material.color.setHex(colorHex);
+	setBarrelColor(colorHex) {
+		this.barrel.children[0].material.color.setHex(colorHex);
 	}
 
 	createBullet() {
