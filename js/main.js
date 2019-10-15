@@ -80,8 +80,9 @@ function createCannon(x, y, z) {
 }
 
 function selectCannon(n) {
+	!cannon ? {} : cannon.unselect();
 	cannon = cannons[n];
-	cannon.setBarrelColor(0xffffff);
+	cannon.select();
 }
 
 function rotateSelectedCannon(angle) {
