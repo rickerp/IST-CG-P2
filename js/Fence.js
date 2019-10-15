@@ -1,21 +1,24 @@
-export default class Fence {
+import './three.js';
+('use strict');
+
+export default class Fence extends THREE.Object3D {
 	object = null;
 	material = null;
 
 	constructor(x, y, z) {
-		this.object = new THREE.Object3D();
+		super();
 		this.material = new THREE.MeshBasicMaterial({
 			color: 0x00ff00,
 			wireframe: false,
 		});
 
-		this.object.position.set(x, y, z);
+		this.position.set(x, y, z);
 	}
 
-	createWall(x, y, z) {
+	addWall(x, y, z) {
 		let geometry = new THREE.CubeGeometry(10, 4, 20);
-		let mesh = new THREE.Mesh(geometry, this.material);
-		mesh.position.set(x, y, z);
-		this.object.add(mesh);
+		let wall = new THREE.Mesh(geometry, this.material);
+		wall.position.set(x, y, z);
+		this.add(wall);
 	}
 }
