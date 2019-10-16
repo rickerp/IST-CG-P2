@@ -1,21 +1,20 @@
 import './three.js';
-import Cannon from './Cannon.js';
-import Bullet from './Bullet.js';
-import Fence from './Fence.js';
+import Cannon from './cannon.js';
+import Bullet from './bullet.js';
+import Fence from './fence.js';
 
 var renderer = null;
 var scene = null;
-
 var keys = {};
-var cameras = [];
-var camera = null;
+var lastTimestamp = 0;
 
+var cameras = [];
 var cannons = [];
+var camera = null;
 var cannon = null;
+
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
-
-var lastTimestamp = 0;
 
 function init() {
 	renderer = new THREE.WebGLRenderer({
@@ -39,7 +38,6 @@ function init() {
 
 	window.addEventListener('keydown', onKeyDown);
 	window.addEventListener('keyup', onKeyUp);
-
 	window.addEventListener('resize', onResize);
 
 	animate(lastTimestamp);
@@ -76,13 +74,14 @@ function createCamera(x, y, z, type) {
 
 function createCannon(x, y, z) {
 	let cannon = new Cannon(x, y, z);
-	scene.add(cannon.object);
+	scene.add(cannon);
 	return cannon;
 }
 
 function selectCannon(n) {
+	!cannon ? {} : cannon.unselect();
 	cannon = cannons[n];
-	cannon.barrel.children[0].material.color.setHex(0xffffff);
+	cannon.select();
 }
 
 function rotateSelectedCannon(angle) {
