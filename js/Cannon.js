@@ -1,57 +1,58 @@
+import './three.js';
 import Bullet from './Bullet.js';
 
-export default class Cannon {
-	object = null;
+export default class Cannon extends THREE.Object3D {
 	barrel = null;
-	shootingPos = null;
+	cannonEnd = null;
 
 	constructor(x, y, z) {
-		this.object = new THREE.Object3D();
-		this.material = new THREE.MeshBasicMaterial({
-			wireframe: false,
-		});
+		super();
+		this.material = new THREE.MeshBasicMaterial({ wireframe: false });
 
-		this.createBase(0, 1, 0);
-		this.createBarrel(-7, 5, 0);
+		this.addBase(0, 1, 0);
+		this.addBarrel(-7, 5, 0);
 
-		this.shootingPos = new THREE.Object3D();
-		this.shootingPos.position.set(-21, 5, 0);
-		this.shootingPos.add(new THREE.AxesHelper(4));
-		this.barrel.add(this.shootingPos);
+		this.cannonEnd = new THREE.Object3D();
+		this.cannonEnd.add(new THREE.AxesHelper(10));
+		this.cannonEnd.position.set(0, 10, 0);
 
-		this.object.position.set(x, y, z);
+		this.barrel.children[0].add(this.cannonEnd);
+		this.position.set(x, y, z);
 	}
 
-	createBase(x, y, z) {
+	addBase(x, y, z) {
 		let geometry = new THREE.CubeGeometry(20, 2, 10);
 		let material = new THREE.MeshBasicMaterial({
 			wireframe: false,
 			color: 0x993e14,
 		});
+		let base = new THREE.Mesh(geometry, material);
 
-		let mesh = new THREE.Mesh(geometry, material);
-		mesh.position.set(x, y, z);
-
-		this.object.add(mesh);
+		base.position.set(x, y, z);
+		this.add(base);
 	}
 
-	createBarrel(x, y, z) {
+	addBarrel(x, y, z) {
 		let geometry = new THREE.CylinderGeometry(4, 4, 20, 32);
 		let material = new THREE.MeshBasicMaterial({
 			wireframe: false,
 			color: 0x808080,
 		});
-
 		let mesh = new THREE.Mesh(geometry, material);
-		this.barrel = new THREE.Object3D();
 		mesh.rotateZ(Math.PI / 2);
 		mesh.position.set(x, y, z);
+
+		this.barrel = new THREE.Object3D();
 		this.barrel.add(mesh);
-		this.object.add(this.barrel);
+		this.add(this.barrel);
 	}
 
 	rotateBarrel(value) {
 		this.barrel.rotateY(value);
+	}
+
+	setBarrelColor(colorHex) {
+		this.barrel.children[0].material.color.setHex(colorHex);
 	}
 
 	createBullet() {
