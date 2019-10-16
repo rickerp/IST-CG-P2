@@ -1,6 +1,5 @@
 import './three.js';
 import Bullet from './Bullet.js';
-('use strict');
 
 export default class Cannon extends THREE.Object3D {
 	barrel = null;

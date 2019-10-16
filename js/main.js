@@ -2,7 +2,6 @@ import './three.js';
 import Cannon from './Cannon.js';
 import Bullet from './Bullet.js';
 import Fence from './Fence.js';
-('use strict');
 
 var renderer = null;
 var scene = null;
