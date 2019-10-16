@@ -1,7 +1,7 @@
 import './three.js';
-import Cannon from './Cannon.js';
-import Bullet from './Bullet.js';
-import Fence from './Fence.js';
+import Cannon from './cannon.js';
+import Bullet from './bullet.js';
+import Fence from './fence.js';
 
 var renderer = null;
 var scene = null;

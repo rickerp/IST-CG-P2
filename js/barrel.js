@@ -1,5 +1,4 @@
 import './three.js';
-('use strict');
 
 export default class Barrel extends THREE.Object3D {
 	constructor(x, y, z, options = {}) {
