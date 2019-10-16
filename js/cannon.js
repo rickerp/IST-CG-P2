@@ -3,9 +3,6 @@ import Bullet from './bullet.js';
 import Barrel from './barrel.js';
 
 export default class Cannon extends THREE.Object3D {
-	barrel = null;
-	cannonEnd = null;
-
 	constructor(x, y, z) {
 		super();
 		this.material = new THREE.MeshBasicMaterial({ wireframe: false });
