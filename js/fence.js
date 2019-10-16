@@ -1,5 +1,4 @@
 import './three.js';
-('use strict');
 
 export default class Fence extends THREE.Object3D {
 	object = null;

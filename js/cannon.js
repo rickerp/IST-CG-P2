@@ -1,6 +1,6 @@
 import './three.js';
-import Barrel from './barrel.js';
-('use strict');
+import Bullet from './Bullet.js';
+import Barrel from './Barrel.js';
 
 export default class Cannon extends THREE.Object3D {
 	barrel = null;
