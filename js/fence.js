@@ -1,8 +1,6 @@
 import './three.js';
 
 export default class Fence extends THREE.Object3D {
-	material = null;
-
 	constructor(x, y, z) {
 		super();
 		this.material = new THREE.MeshBasicMaterial({

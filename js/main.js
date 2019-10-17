@@ -13,6 +13,8 @@ var cannons = [];
 var camera = null;
 var cannon = null;
 
+var fence = null;
+
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
 
@@ -27,14 +29,16 @@ function init() {
 	createScene();
 
 	cameras[0] = createCamera(0, 100, 0, 0);
-	cameras[1] = createCamera(70, 20, 0, 1);
+	cameras[1] = createCamera(130, 20, 0, 1);
 	cameras[2] = createCamera(0, 0, 50, 1);
 	camera = cameras[0];
 
-	cannons[0] = createCannon(30, 0, -30);
-	cannons[1] = createCannon(30, 0, 0);
-	cannons[2] = createCannon(30, 0, 30);
+	cannons[0] = createCannon(80, 0, -30);
+	cannons[1] = createCannon(80, 0, 0);
+	cannons[2] = createCannon(80, 0, 30);
 	selectCannon(0);
+
+	fence = createFence(-70, 10, 0);
 
 	window.addEventListener('keydown', onKeyDown);
 	window.addEventListener('keyup', onKeyUp);
@@ -51,10 +55,10 @@ function createScene() {
 function createCamera(x, y, z, type) {
 	if (type === 0) {
 		var camera = new THREE.OrthographicCamera(
-			window.innerWidth / -18,
-			window.innerWidth / 18,
-			window.innerHeight / 18,
-			window.innerHeight / -18,
+			window.innerWidth / -12,
+			window.innerWidth / 12,
+			window.innerHeight / 12,
+			window.innerHeight / -12,
 			-200,
 			500
 		);
@@ -76,6 +80,12 @@ function createCannon(x, y, z) {
 	let cannon = new Cannon(x, y, z);
 	scene.add(cannon);
 	return cannon;
+}
+
+function createFence(x, y, z) {
+	let fence = new Fence(x, y, z);
+	scene.add(fence);
+	return fence;
 }
 
 function selectCannon(n) {
@@ -123,13 +133,13 @@ function onKeyDown(e) {
 			camera = cameras[2];
 			break;
 		case 81: // q
-			selectCannon(0);
+			selectCannon(2);
 			break;
 		case 87: // w
 			selectCannon(1);
 			break;
 		case 69: // e
-			selectCannon(2);
+			selectCannon(0);
 			break;
 		case 37: // left arrow
 			sideRotation = barrelRotationSpeed;
