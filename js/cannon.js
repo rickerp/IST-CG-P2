@@ -33,6 +33,7 @@ export default class Cannon extends THREE.Object3D {
 
 	rotateBarrel(value) {
 		this.barrel.rotateY(value);
+		this.barrel.totalRotation += value;
 	}
 
 	select() {
@@ -45,9 +46,10 @@ export default class Cannon extends THREE.Object3D {
 
 	createBullet() {
 		return new Bullet(
-			this.shootingPos.position.x,
-			this.shootingPos.position.y,
-			this.shootingPos.position.z
+			this.children[1].getEndPos()[0].x,
+			this.children[1].getEndPos()[0].y,
+			this.children[1].getEndPos()[0].z,
+			this.children[1].getEndPos()[1]
 		);
 	}
 }

@@ -11,6 +11,7 @@ export default class Barrel extends THREE.Object3D {
 		const height = options.height || 8;
 		const lenght = options.lenght || 20 + height / 2;
 
+		this.totalRotation = 0;
 		this.addCylinder(
 			0,
 			0,
@@ -52,6 +53,9 @@ export default class Barrel extends THREE.Object3D {
 	}
 
 	getEndPos() {
-		return this.face.position;
+		this.updateMatrixWorld();
+		var vector = new THREE.Vector3();
+		vector.setFromMatrixPosition(this.face.matrixWorld);
+		return [vector, this.totalRotation];
 	}
 }

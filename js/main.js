@@ -15,6 +15,8 @@ var cannon = null;
 
 var fence = null;
 
+var bullets = [];
+
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
 
@@ -82,6 +84,12 @@ function createCannon(x, y, z) {
 	return cannon;
 }
 
+function createBullet() {
+	let bullet = cannon.createBullet();
+	bullets.push(bullet);
+	scene.add(bullet);
+}
+
 function createFence(x, y, z) {
 	let fence = new Fence(x, y, z);
 	scene.add(fence);
@@ -146,6 +154,10 @@ function onKeyDown(e) {
 			break;
 		case 39: // right arrow
 			sideRotation = -barrelRotationSpeed;
+			break;
+		case 32: // space
+			createBullet();
+			break;
 	}
 }
 
@@ -160,6 +172,12 @@ function render() {
 
 function update(delta) {
 	rotateSelectedCannon(sideRotation * delta);
+	for (var i = 0; i < bullets.length; i++) {
+		bullets[i].translateOnAxis(
+			bullets[i].velocity,
+			bullets[i].speed * delta
+		);
+	}
 }
 
 function animate(ts) {
