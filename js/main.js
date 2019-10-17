@@ -16,6 +16,8 @@ var cannon = null;
 var fence = null;
 
 var bullets = [];
+var friction = 0.9; //applied to balls that have collided
+var following_camera = false;
 
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
@@ -133,12 +135,18 @@ function onKeyDown(e) {
 	switch (e.keyCode) {
 		case 49: // 1 upper_camera
 			camera = cameras[0];
+			following_camera = false;
 			break;
 		case 50: // 2 perspective_camera
 			camera = cameras[1];
+			following_camera = false;
 			break;
 		case 51: // 3 ball_camera
-			camera = cameras[2];
+			if (bullets.length > 0) {
+				// if a ball exists
+				following_camera = true;
+				camera = cameras[2];
+			}
 			break;
 		case 81: // q
 			selectCannon(2);
@@ -177,6 +185,17 @@ function update(delta) {
 			bullets[i].velocity,
 			bullets[i].speed * delta
 		);
+		if (bullets[i].collision == true)
+			bullets[i].speed -= bullets[i].speed * friction * delta;
+	}
+	if (following_camera == true) {
+		setCameraPosition(
+			bullets[bullets.length - 1].position.x,
+			bullets[bullets.length - 1].position.y,
+			bullets[bullets.length - 1].position.z,
+			2
+		);
+		camera.lookAt(scene.position); // should be on bullet z axis
 	}
 }
 

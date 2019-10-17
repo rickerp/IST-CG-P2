@@ -55,7 +55,7 @@ export default class Barrel extends THREE.Object3D {
 	getEndPos() {
 		this.updateMatrixWorld();
 		var vector = new THREE.Vector3();
-		vector.setFromMatrixPosition(this.face.matrixWorld);
+		vector.setFromMatrixPosition(this.face.matrixWorld); // gets the position of the end cannon in world coordinates
 		return [vector, this.totalRotation];
 	}
 }
