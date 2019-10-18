@@ -8,7 +8,7 @@ export default class Bullet extends THREE.Object3D {
 			wireframe: false,
 		});
 
-		this.speed = 2 + Math.random() * 5;
+		this.speed = 2 + Math.random() * 2;
 		this.geometry = new THREE.SphereGeometry(4, 32, 32);
 		this.velocity = new THREE.Vector3();
 		this.velocity.set(

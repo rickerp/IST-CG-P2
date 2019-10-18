@@ -16,7 +16,7 @@ var cannon = null;
 var fence = null;
 
 var bullets = [];
-var friction = 0.9; //applied to balls that have collided
+var friction = 0.9;
 var following_camera = false;
 
 var barrelRotationSpeed = 1.5;
@@ -185,7 +185,10 @@ function update(delta) {
 		bullets[i].position.x += bullets[i].velocity.x * bullets[i].speed;
 		bullets[i].position.z += bullets[i].velocity.z * bullets[i].speed;
 		bullets[i].rotateOnAxis(bullets[i].velocity, delta * bullets[i].speed); //TODO: rotate along bullet movement
-		bullets[i].speed -= bullets[i].speed * friction * delta;
+		console.log(bullets[i].speed, friction * delta);
+		if (bullets[i].speed > 0)
+			bullets[i].speed = bullets[i].speed - friction * delta;
+		else bullets[i].speed = 0; // avoids negative speed
 	}
 	if (following_camera == true) {
 		let vec = bullets[bullets.length - 1].position;
