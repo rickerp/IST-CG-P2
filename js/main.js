@@ -182,23 +182,19 @@ function update(delta) {
 	rotateSelectedCannon(sideRotation * delta);
 
 	for (let i = 0; i < bullets.length; i++) {
-		console.log(bullets[i].speed);
-		if (bullets[i].speed > 0) {
-			bullets[i].position.x +=
-				bullets[i].velocity.x * bullets[i].speed * delta +
-				0.5 * delta * delta * friction;
-			bullets[i].position.z +=
-				bullets[i].velocity.z * bullets[i].speed * delta +
-				0.5 * delta * delta * friction;
-
-			bullets[i].rotateOnAxis(
-				bullets[i].velocity,
-				(delta * bullets[i].speed) / 5
-			); //TODO: rotate along bullet movement
-
-			bullets[i].speed = bullets[i].speed - friction * delta;
-		} else bullets[i].speed = 0; // avoids negative speed
+		bullets[i].speed = Math.max(0, bullets[i].speed - friction * delta);
+		bullets[i].position.x +=
+			bullets[i].velocity.x * bullets[i].speed * delta +
+			0.5 * delta * delta * friction;
+		bullets[i].position.z +=
+			bullets[i].velocity.z * bullets[i].speed * delta +
+			0.5 * delta * delta * friction;
+		bullets[i].rotateOnAxis(
+			bullets[i].velocity,
+			(delta * bullets[i].speed) / 5
+		); //TODO: rotate along bullet movement
 	}
+
 	if (following_camera == true) {
 		let vec = bullets[bullets.length - 1].position;
 		setCameraPosition(vec.x, vec.y, vec.z, 2);
