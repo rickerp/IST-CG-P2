@@ -17,8 +17,8 @@ var fence = null;
 
 var bullets = [];
 var friction = 70;
-var rotationSpeed = Math.PI / 2; // 90 degrees per second
-var following_camera = false;
+var rotationPerSpeed = 0.4; // 90 degrees per second
+var followingCamera = false;
 
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
@@ -136,16 +136,16 @@ function onKeyDown(e) {
 	switch (e.keyCode) {
 		case 49: // 1 upper_camera
 			camera = cameras[0];
-			following_camera = false;
+			followingCamera = false;
 			break;
 		case 50: // 2 perspective_camera
 			camera = cameras[1];
-			following_camera = false;
+			followingCamera = false;
 			break;
 		case 51: // 3 ball_camera
 			if (bullets.length > 0) {
 				// if a ball exists
-				following_camera = true;
+				followingCamera = true;
 				camera = cameras[2];
 			}
 			break;
@@ -170,11 +170,6 @@ function onKeyDown(e) {
 	}
 }
 
-function setCameraPosition(x, y, z, n) {
-	cameras[n].position.set(x, y, z);
-	cameras[n].lookAt(scene.position);
-}
-
 function render() {
 	renderer.render(scene, camera);
 }
@@ -182,19 +177,34 @@ function render() {
 function update(delta) {
 	rotateSelectedCannon(sideRotation * delta);
 
-	for (let i = 0; i < bullets.length; i++) {
-		bullets[i].speed = Math.max(0, bullets[i].speed - friction * delta);
-		bullets[i].position.x +=
-			bullets[i].velocity.x * bullets[i].speed * delta;
-		bullets[i].position.z +=
-			bullets[i].velocity.z * bullets[i].speed * delta;
-		bullets[i].rotateOnAxis(bullets[i].velocity, rotationSpeed * delta);
-	}
+	bullets.forEach(bullet => {
+		bullet.speed = Math.max(0, bullet.speed - friction * delta);
+		bullet.position.x += bullet.velocity.x * bullet.speed * delta;
+		bullet.position.z += bullet.velocity.z * bullet.speed * delta;
 
-	if (following_camera == true) {
-		let vec = bullets[bullets.length - 1].position;
-		setCameraPosition(vec.x, vec.y, vec.z, 2);
-		camera.lookAt(scene.position); //  TODO: should be aiming at the bullet a little bit behind her
+		let perpendicular = new THREE.Vector3(
+			bullet.velocity.z,
+			bullet.velocity.y,
+			-bullet.velocity.x
+		);
+
+		bullet.rotateOnAxis(
+			perpendicular,
+			rotationPerSpeed * bullet.speed * delta
+		);
+	});
+
+	if (followingCamera) {
+		let lastBullet = bullets[bullets.length - 1];
+		let pos = lastBullet.position;
+		let norm = lastBullet.velocity.clone().normalize();
+		camera.position.set(
+			pos.x - norm.x * 20,
+			pos.y + 20,
+			pos.z - norm.z * 20,
+			2
+		);
+		camera.lookAt(pos);
 	}
 }
 
