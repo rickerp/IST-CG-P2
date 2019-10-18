@@ -184,15 +184,10 @@ function update(delta) {
 	for (let i = 0; i < bullets.length; i++) {
 		bullets[i].speed = Math.max(0, bullets[i].speed - friction * delta);
 		bullets[i].position.x +=
-			bullets[i].velocity.x * bullets[i].speed * delta +
-			0.5 * delta * delta * friction;
+			bullets[i].velocity.x * bullets[i].speed * delta;
 		bullets[i].position.z +=
-			bullets[i].velocity.z * bullets[i].speed * delta +
-			0.5 * delta * delta * friction;
-		bullets[i].rotateOnAxis(
-			bullets[i].velocity,
-			(delta * bullets[i].speed) / 5
-		); //TODO: rotate along bullet movement
+			bullets[i].velocity.z * bullets[i].speed * delta;
+		bullets[i].rotateOnAxis(bullets[i].velocity, bullets[i].speed / 5); //TODO: rotate along bullet movement
 	}
 
 	if (following_camera == true) {
