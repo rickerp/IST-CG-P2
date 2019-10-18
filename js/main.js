@@ -16,7 +16,7 @@ var cannon = null;
 var fence = null;
 
 var bullets = [];
-var friction = 0.9;
+var friction = 70;
 var following_camera = false;
 
 var barrelRotationSpeed = 1.5;
@@ -182,13 +182,22 @@ function update(delta) {
 	rotateSelectedCannon(sideRotation * delta);
 
 	for (let i = 0; i < bullets.length; i++) {
-		bullets[i].position.x += bullets[i].velocity.x * bullets[i].speed;
-		bullets[i].position.z += bullets[i].velocity.z * bullets[i].speed;
-		bullets[i].rotateOnAxis(bullets[i].velocity, delta * bullets[i].speed); //TODO: rotate along bullet movement
-		console.log(bullets[i].speed, friction * delta);
-		if (bullets[i].speed > 0)
+		console.log(bullets[i].speed);
+		if (bullets[i].speed > 0) {
+			bullets[i].position.x +=
+				bullets[i].velocity.x * bullets[i].speed * delta +
+				0.5 * delta * delta * friction;
+			bullets[i].position.z +=
+				bullets[i].velocity.z * bullets[i].speed * delta +
+				0.5 * delta * delta * friction;
+
+			bullets[i].rotateOnAxis(
+				bullets[i].velocity,
+				(delta * bullets[i].speed) / 5
+			); //TODO: rotate along bullet movement
+
 			bullets[i].speed = bullets[i].speed - friction * delta;
-		else bullets[i].speed = 0; // avoids negative speed
+		} else bullets[i].speed = 0; // avoids negative speed
 	}
 	if (following_camera == true) {
 		let vec = bullets[bullets.length - 1].position;
