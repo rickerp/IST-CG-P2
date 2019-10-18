@@ -17,6 +17,7 @@ var fence = null;
 
 var bullets = [];
 var friction = 70;
+var rotationSpeed = Math.PI / 2; // 90 degrees per second
 var following_camera = false;
 
 var barrelRotationSpeed = 1.5;
@@ -187,7 +188,7 @@ function update(delta) {
 			bullets[i].velocity.x * bullets[i].speed * delta;
 		bullets[i].position.z +=
 			bullets[i].velocity.z * bullets[i].speed * delta;
-		bullets[i].rotateOnAxis(bullets[i].velocity, bullets[i].speed / 5); //TODO: rotate along bullet movement
+		bullets[i].rotateOnAxis(bullets[i].velocity, rotationSpeed * delta);
 	}
 
 	if (following_camera == true) {
