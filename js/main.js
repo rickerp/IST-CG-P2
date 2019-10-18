@@ -180,18 +180,17 @@ function render() {
 
 function update(delta) {
 	rotateSelectedCannon(sideRotation * delta);
+
 	for (let i = 0; i < bullets.length; i++) {
-		bullets[i].translateOnAxis(
-			bullets[i].velocity,
-			bullets[i].speed * delta
-		);
-		if (bullets[i].collision == true)
-			bullets[i].speed -= bullets[i].speed * friction * delta;
+		bullets[i].position.x += bullets[i].velocity.x * bullets[i].speed;
+		bullets[i].position.z += bullets[i].velocity.z * bullets[i].speed;
+		bullets[i].rotateOnAxis(bullets[i].velocity, delta * bullets[i].speed); //TODO: rotate along bullet movement
+		bullets[i].speed -= bullets[i].speed * friction * delta;
 	}
 	if (following_camera == true) {
 		let vec = bullets[bullets.length - 1].position;
 		setCameraPosition(vec.x, vec.y, vec.z, 2);
-		camera.lookAt(scene.position); // should be on bullet z axis
+		camera.lookAt(scene.position); //  TODO: should be aiming at the bullet a little bit behind her
 	}
 }
 
