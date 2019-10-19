@@ -15,6 +15,11 @@ var cannon = null;
 
 var fence = null;
 
+var bullets = [];
+var friction = 70;
+var rotationPerSpeed = 0.4; // 90 degrees per second
+var followingCamera = false;
+
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
 
@@ -82,6 +87,12 @@ function createCannon(x, y, z) {
 	return cannon;
 }
 
+function createBullet() {
+	let bullet = cannon.createBullet();
+	bullets.push(bullet);
+	scene.add(bullet);
+}
+
 function createFence(x, y, z) {
 	let fence = new Fence(x, y, z);
 	scene.add(fence);
@@ -125,12 +136,18 @@ function onKeyDown(e) {
 	switch (e.keyCode) {
 		case 49: // 1 upper_camera
 			camera = cameras[0];
+			followingCamera = false;
 			break;
 		case 50: // 2 perspective_camera
 			camera = cameras[1];
+			followingCamera = false;
 			break;
 		case 51: // 3 ball_camera
-			camera = cameras[2];
+			if (bullets.length > 0) {
+				// if a ball exists
+				followingCamera = true;
+				camera = cameras[2];
+			}
 			break;
 		case 81: // q
 			selectCannon(2);
@@ -146,12 +163,11 @@ function onKeyDown(e) {
 			break;
 		case 39: // right arrow
 			sideRotation = -barrelRotationSpeed;
+			break;
+		case 32: // space
+			createBullet();
+			break;
 	}
-}
-
-function setCameraPosition(x, y, z, n) {
-	cameras[n].position.set(x, y, z);
-	cameras[n].lookAt(scene.position);
 }
 
 function render() {
@@ -160,6 +176,36 @@ function render() {
 
 function update(delta) {
 	rotateSelectedCannon(sideRotation * delta);
+
+	bullets.forEach(bullet => {
+		bullet.speed = Math.max(0, bullet.speed - friction * delta);
+		bullet.position.x += bullet.velocity.x * bullet.speed * delta;
+		bullet.position.z += bullet.velocity.z * bullet.speed * delta;
+
+		let perpendicular = new THREE.Vector3(
+			bullet.velocity.z,
+			bullet.velocity.y,
+			-bullet.velocity.x
+		);
+
+		bullet.rotateOnAxis(
+			perpendicular,
+			rotationPerSpeed * bullet.speed * delta
+		);
+	});
+
+	if (followingCamera) {
+		let lastBullet = bullets[bullets.length - 1];
+		let pos = lastBullet.position;
+		let norm = lastBullet.velocity.clone().normalize();
+		camera.position.set(
+			pos.x - norm.x * 20,
+			pos.y + 20,
+			pos.z - norm.z * 20,
+			2
+		);
+		camera.lookAt(pos);
+	}
 }
 
 function animate(ts) {
