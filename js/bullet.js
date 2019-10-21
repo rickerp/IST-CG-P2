@@ -1,6 +1,8 @@
 import './three.js';
 
 export default class Bullet extends THREE.Object3D {
+	axes = new THREE.AxesHelper(10);
+
 	constructor(x, y, z, angle) {
 		super();
 		this.material = new THREE.MeshBasicMaterial({
@@ -16,8 +18,12 @@ export default class Bullet extends THREE.Object3D {
 			0,
 			Math.cos(angle - Math.PI / 2)
 		);
-		this.add(new THREE.AxesHelper(10));
+		this.add(this.axes);
 		this.add(new THREE.Mesh(this.geometry, this.material));
 		this.position.set(x, y, z);
+	}
+
+	toggleAxes() {
+		this.axes.visible = !this.axes.visible;
 	}
 }

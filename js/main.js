@@ -118,6 +118,10 @@ function onResize() {
 	camera.updateProjectionMatrix();
 }
 
+function toggleBulletAxes() {
+	bullets.forEach(bullet => bullet.toggleAxes());
+}
+
 function onKeyUp(e) {
 	keys[e.keyCode] = false;
 	switch (e.keyCode) {
@@ -166,6 +170,9 @@ function onKeyDown(e) {
 			break;
 		case 32: // space
 			createBullet();
+			break;
+		case 82: // r
+			toggleBulletAxes();
 			break;
 	}
 }
