@@ -13,7 +13,7 @@ export default class Bullet extends THREE.Object3D {
 		});
 
 		this.geometry = new THREE.SphereGeometry(4, 32, 32);
-		this.add(new THREE.AxesHelper(10));
+		this.add(this.axes);
 		this.add(new THREE.Mesh(this.geometry, this.material));
 		this.position.set(x, y, z);
 	}
