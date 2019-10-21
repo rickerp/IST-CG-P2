@@ -39,6 +39,8 @@ function init() {
 	cameras[2] = createCamera(0, 0, 50, 1);
 	camera = cameras[0];
 
+	updateCameras();
+
 	cannons[0] = createCannon(80, 0, -30);
 	cannons[1] = createCannon(80, 0, 0);
 	cannons[2] = createCannon(80, 0, 30);
@@ -94,23 +96,32 @@ function createScene() {
 	scene.add(new THREE.AxisHelper(10));
 }
 
+function updateCameras() {
+	// Update ortographic camera
+	Object.assign(cameras[0], {
+		left: window.innerWidth / -12,
+		right: window.innerWidth / 12,
+		top: window.innerHeight / 12,
+		bottom: window.innerHeight / -12,
+	});
+	// Update perspective camera
+	cameras[1].aspect = cameras[2].aspect =
+		window.innerWidth / window.innerHeight;
+
+	cameras.forEach(camera => camera.updateProjectionMatrix());
+}
+
 function createCamera(x, y, z, type) {
+	let camera;
 	if (type === 0) {
-		var camera = new THREE.OrthographicCamera(
-			window.innerWidth / -12,
-			window.innerWidth / 12,
-			window.innerHeight / 12,
-			window.innerHeight / -12,
-			-200,
-			500
-		);
+		camera = new THREE.OrthographicCamera();
+		camera.near = -200;
+		camera.far = 500;
 	} else if (type === 1) {
-		var camera = new THREE.PerspectiveCamera(
-			70,
-			window.innerWidth / window.innerHeight,
-			1,
-			1000
-		);
+		camera = new THREE.PerspectiveCamera();
+		camera.fov = 70;
+		camera.near = 1;
+		camera.far = 1000;
 	}
 
 	camera.position.set(x, y, z);
@@ -147,11 +158,7 @@ function rotateSelectedCannon(angle) {
 
 function onResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	camera.left = -window.innerWidth / 18;
-	camera.right = window.innerWidth / 18;
-	camera.top = window.innerHeight / 18;
-	camera.bottom = -window.innerHeight / 18;
-	camera.updateProjectionMatrix();
+	updateCameras();
 }
 
 function toggleBulletAxes() {
