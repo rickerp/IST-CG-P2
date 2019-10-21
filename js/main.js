@@ -167,14 +167,6 @@ function toggleBulletAxes() {
 
 function onKeyUp(e) {
 	keys[e.keyCode] = false;
-	switch (e.keyCode) {
-		case 37:
-			sideRotation = 0;
-			break;
-		case 39:
-			sideRotation = 0;
-			break;
-	}
 }
 
 function onKeyDown(e) {
