@@ -205,12 +205,6 @@ function onKeyDown(e) {
 		case 69: // e
 			selectCannon(0);
 			break;
-		case 37: // left arrow
-			sideRotation = barrelRotationSpeed;
-			break;
-		case 39: // right arrow
-			sideRotation = -barrelRotationSpeed;
-			break;
 		case 32: // space
 			shootBullet();
 			break;
@@ -225,6 +219,11 @@ function render() {
 }
 
 function update(delta) {
+	let sideRotation = 0;
+	// left arrow
+	if (keys[37]) sideRotation += barrelRotationSpeed;
+	// right arrow
+	if (keys[39]) sideRotation -= barrelRotationSpeed;
 	rotateSelectedCannon(sideRotation * delta);
 
 	bullets.forEach(bullet => {
