@@ -46,6 +46,16 @@ export default class Cannon extends THREE.Object3D {
 
 	createBullet() {
 		let [position, rotation] = this.children[1].getEndPos();
-		return new Bullet(position.x, position.y, position.z, rotation);
+
+		let bullet = new Bullet(position.x, position.y, position.z, rotation);
+		bullet.speed = 170 + Math.random() * 20; // Should really be random?
+		bullet.velocity = new THREE.Vector3();
+		bullet.velocity.set(
+			Math.sin(rotation - Math.PI / 2),
+			0,
+			Math.cos(rotation - Math.PI / 2)
+		);
+
+		return bullet;
 	}
 }
