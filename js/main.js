@@ -2,6 +2,7 @@ import './three.js';
 import Cannon from './cannon.js';
 import Bullet from './bullet.js';
 import Fence from './fence.js';
+import { randomInt } from './util.js';
 
 var renderer = null;
 var scene = null;
@@ -44,12 +45,48 @@ function init() {
 	selectCannon(0);
 
 	fence = createFence(-70, 10, 0);
+	createBulletField();
 
 	window.addEventListener('keydown', onKeyDown);
 	window.addEventListener('keyup', onKeyUp);
 	window.addEventListener('resize', onResize);
 
 	animate(lastTimestamp);
+}
+
+function addBullet(bullet) {
+	bullets.push(bullet);
+	scene.add(bullet);
+}
+
+function createBulletField() {
+	const origin = new THREE.Vector3(-60, 0, 50);
+
+	const blockSize = 10;
+	const width = 9;
+	const length = 9;
+
+	const numberOfBlocks = width * length;
+	// 10 to 30% filled
+	const numberOfBullets = randomInt(
+		0.1 * numberOfBlocks,
+		0.3 * numberOfBlocks
+	);
+	const visited = {};
+
+	let i = 0;
+	while (i < numberOfBullets) {
+		let n = randomInt(0, numberOfBlocks);
+		if (visited[n]) continue;
+
+		let x = Math.floor(n / width) * blockSize;
+		let y = (n % width) * blockSize - blockSize * length;
+
+		let bullet = new Bullet(x, 0, y);
+		bullet.position.add(origin);
+		addBullet(bullet);
+		i++;
+	}
 }
 
 function createScene() {
@@ -87,10 +124,9 @@ function createCannon(x, y, z) {
 	return cannon;
 }
 
-function createBullet() {
+function shootBullet() {
 	let bullet = cannon.createBullet();
-	bullets.push(bullet);
-	scene.add(bullet);
+	addBullet(bullet);
 }
 
 function createFence(x, y, z) {
@@ -169,7 +205,7 @@ function onKeyDown(e) {
 			sideRotation = -barrelRotationSpeed;
 			break;
 		case 32: // space
-			createBullet();
+			shootBullet();
 			break;
 		case 82: // r
 			toggleBulletAxes();
