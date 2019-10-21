@@ -15,6 +15,7 @@ var camera = null;
 var cannon = null;
 
 var fence = null;
+var axes = true;
 
 var bullets = [];
 var friction = 70;
@@ -57,6 +58,7 @@ function init() {
 }
 
 function addBullet(bullet) {
+	bullet.axes.visible = axes;
 	bullets.push(bullet);
 	scene.add(bullet);
 }
@@ -162,7 +164,8 @@ function onResize() {
 }
 
 function toggleBulletAxes() {
-	bullets.forEach(bullet => bullet.toggleAxes());
+	axes = !axes;
+	bullets.forEach(bullet => (bullet.axes.visible = axes));
 }
 
 function onKeyUp(e) {
