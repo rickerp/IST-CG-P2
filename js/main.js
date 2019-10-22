@@ -115,6 +115,10 @@ function updateCameras() {
 	const width = (a_ratio * 100 * 945) / window.innerHeight;
 	const height = (100 * 1920) / window.innerWidth;
 
+	const new_ar = window.innerWidth / window.innerHeight;
+	const new_x = Math.pow(2 * 130, 1 / new_ar);
+	const new_y = Math.pow(2 * 20, 1 / new_ar);
+
 	Object.assign(cameras[0], {
 		left: -width / 2,
 		right: width / 2,
@@ -122,8 +126,11 @@ function updateCameras() {
 		bottom: -height / 2,
 	});
 	// Update perspective camera
-	cameras[1].aspect = cameras[2].aspect =
-		window.innerWidth / window.innerHeight;
+
+	cameras[1].aspect = cameras[2].aspect = new_ar;
+
+	cameras[1].position.x = Math.max(130, new_x);
+	cameras[1].position.y = Math.max(20, new_y);
 
 	cameras.forEach(camera => camera.updateProjectionMatrix());
 }
