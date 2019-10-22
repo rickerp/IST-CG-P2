@@ -293,7 +293,7 @@ function handleCollisions(delta) {
 
 			// If positions are same, give tiny separation to solve collision
 			if (x1.equals(x2)) {
-				x1.addScalar(1e-10)
+				x1.addScalar(1e-10);
 			}
 
 			let a = v1.clone().sub(v2).dot(x1.clone().sub(x2));
