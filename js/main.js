@@ -185,14 +185,6 @@ function toggleBulletAxes() {
 
 function onKeyUp(e) {
 	keys[e.keyCode] = false;
-	switch (e.keyCode) {
-		case 37:
-			sideRotation = 0;
-			break;
-		case 39:
-			sideRotation = 0;
-			break;
-	}
 }
 
 function onKeyDown(e) {
@@ -222,12 +214,6 @@ function onKeyDown(e) {
 			break;
 		case 69: // e
 			selectCannon(0);
-			break;
-		case 37: // left arrow
-			sideRotation = barrelRotationSpeed;
-			break;
-		case 39: // right arrow
-			sideRotation = -barrelRotationSpeed;
 			break;
 		case 32: // space
 			shootBullet();
@@ -330,6 +316,11 @@ function handleCollisions(delta) {
 }
 
 function update(delta) {
+	let sideRotation = 0;
+	// left arrow
+	if (keys[37]) sideRotation += barrelRotationSpeed;
+	// right arrow
+	if (keys[39]) sideRotation -= barrelRotationSpeed;
 	handleCollisions(delta);
 	rotateSelectedCannon(sideRotation * delta);
 
