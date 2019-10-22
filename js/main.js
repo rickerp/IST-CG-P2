@@ -17,7 +17,7 @@ var cannon = null;
 var fence = null;
 
 var bullets = [];
-var friction = 70;
+var friction = 200;
 var rotationPerSpeed = 0.4; // 90 degrees per second
 var followingCamera = false;
 
@@ -26,7 +26,7 @@ var sideRotation = 0;
 
 function init() {
 	renderer = new THREE.WebGLRenderer({
-		antialias: false,
+		antialias: true,
 	});
 
 	renderer.setSize(window.innerWidth, window.innerHeight);
@@ -49,11 +49,25 @@ function init() {
 	fence = createFence(-70, 10, 0);
 	createBulletField();
 
+	createBase(-22, -2, 0);
+
 	window.addEventListener('keydown', onKeyDown);
 	window.addEventListener('keyup', onKeyUp);
 	window.addEventListener('resize', onResize);
 
 	animate(lastTimestamp);
+}
+
+function createBase(x, y, z) {
+	let geometry = new THREE.CubeGeometry(100, 4, 104);
+	let material = new THREE.MeshBasicMaterial({
+		wireframe: false,
+		color: 0xa4a4a4,
+	});
+	let base = new THREE.Mesh(geometry, material);
+
+	base.position.set(x, y, z);
+	scene.add(base);
 }
 
 function addBullet(bullet) {
@@ -62,7 +76,7 @@ function addBullet(bullet) {
 }
 
 function createBulletField() {
-	const origin = new THREE.Vector3(-60, 0, 50);
+	const origin = new THREE.Vector3(-60, 4, -40);
 
 	const blockSize = 10;
 	const width = 9;
@@ -80,9 +94,10 @@ function createBulletField() {
 	while (i < numberOfBullets) {
 		let n = randomInt(0, numberOfBlocks);
 		if (visited[n]) continue;
+		visited[n] = true;
 
 		let x = Math.floor(n / width) * blockSize;
-		let y = (n % width) * blockSize - blockSize * length;
+		let y = (n % width) * blockSize;
 
 		let bullet = new Bullet(x, 0, y);
 		bullet.position.add(origin);
@@ -224,13 +239,110 @@ function render() {
 	renderer.render(scene, camera);
 }
 
+function handleCollisions(delta) {
+	// Find all ball-wall collisions
+	for (let bullet of bullets) {
+		// Create AABB
+		let x = bullet.position.x - bullet.radius;
+		let z = bullet.position.z - bullet.radius;
+		let size = bullet.radius * 2;
+
+		// Ignore bullets out of the fence
+		if (bullet.gone) {
+			continue;
+		}
+
+		// Check if it's out of the fence
+		if (x + size > 40) {
+			// And out of canion area
+			if (z < -48 || z > 54) {
+				bullet.gone = true;
+				bullet.velocity.y = -50;
+			}
+			continue;
+		}
+
+		// Left wall
+		if (x < -68) {
+			bullet.position.x = -68 + bullet.radius;
+			bullet.velocity.x *= -1;
+		}
+
+		// Top wall
+		if (z < -48 && z + size > -44) {
+			bullet.position.z = -48 + bullet.radius;
+			bullet.velocity.z *= -1;
+		}
+
+		// Bottom wall
+		if (z + size > 48 && z + size < 54) {
+			bullet.position.z = 48 - bullet.radius;
+			bullet.velocity.z *= -1;
+		}
+	}
+	// Find all bullet pairs
+	for (let i = 0; i < bullets.length; ++i) {
+		// prettier-ignore
+		// ^ allows inline method chaining
+		for (let j = i + 1; j < bullets.length; ++j) {
+			let b1 = bullets[i];
+			let b2 = bullets[j];
+
+			let distance = b1.position.distanceTo(b2.position);
+
+			// No collision
+			if (distance > b1.radius + b2.radius) {
+				continue;
+			}
+
+			// https://en.wikipedia.org/wiki/Elastic_collision
+
+			let x1 = b1.position.clone();
+			let x2 = b2.position.clone();
+			let v1 = b1.velocity.clone();
+			let v2 = b2.velocity.clone();
+
+			let a = v1.clone().sub(v2).dot(x1.clone().sub(x2));
+			let b = x1.clone().sub(x2).length() ** 2;
+			let c = x1.clone().sub(x2).multiplyScalar(-a/b);
+
+			b1.velocity.add(c);
+			b1.velocity.y = 0;
+
+			a = v2.clone().sub(v1).dot(x2.clone().sub(x1));
+			b = x2.clone().sub(x1).length() ** 2;
+			c = x2.clone().sub(x1).multiplyScalar(-a/b);
+
+			b2.velocity.add(c);
+			b2.velocity.y = 0;
+
+			let dir = b1.position.clone().sub(b2.position).normalize();
+			let diff = (b1.radius + b2.radius) - distance;
+
+			// Let's solve collision
+			b1.position.add(dir.clone().multiplyScalar(diff / 2));
+			b2.position.sub(dir.clone().multiplyScalar(diff / 2));
+		}
+	}
+}
+
 function update(delta) {
+	handleCollisions(delta);
 	rotateSelectedCannon(sideRotation * delta);
 
 	bullets.forEach(bullet => {
-		bullet.speed = Math.max(0, bullet.speed - friction * delta);
-		bullet.position.x += bullet.velocity.x * bullet.speed * delta;
-		bullet.position.z += bullet.velocity.z * bullet.speed * delta;
+		// Calculate instant velocity
+		let speed = bullet.velocity.length();
+		// Get normalized direction
+		let direction = bullet.velocity.clone().normalize();
+		// Decrease speed with friction and calculate new velocity
+		speed = Math.max(0, speed - friction * delta);
+		bullet.velocity.x = direction.x * speed;
+		bullet.velocity.z = direction.z * speed;
+
+		bullet.position.x += bullet.velocity.x * delta;
+		bullet.position.y += bullet.velocity.y * delta;
+		bullet.position.z += bullet.velocity.z * delta;
 
 		let perpendicular = new THREE.Vector3(
 			bullet.velocity.z,
@@ -238,22 +350,18 @@ function update(delta) {
 			-bullet.velocity.x
 		);
 
-		bullet.rotateOnAxis(
-			perpendicular,
-			rotationPerSpeed * bullet.speed * delta
-		);
+		if (speed > 0) {
+			bullet.rotateOnAxis(
+				perpendicular.normalize(),
+				rotationPerSpeed * speed * delta
+			);
+		}
 	});
 
 	if (followingCamera) {
 		let lastBullet = bullets[bullets.length - 1];
 		let pos = lastBullet.position;
-		let norm = lastBullet.velocity.clone().normalize();
-		camera.position.set(
-			pos.x - norm.x * 20,
-			pos.y + 20,
-			pos.z - norm.z * 20,
-			2
-		);
+		camera.position.set(pos.x + 50, pos.y + 50, pos.z);
 		camera.lookAt(pos);
 	}
 }
