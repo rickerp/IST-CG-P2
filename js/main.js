@@ -48,7 +48,7 @@ function init() {
 	selectCannon(0);
 
 	fence = createFence(-70, 10, 0);
-	createBulletField();
+	createBulletField(10, 9, 9);
 
 	createBase(-22, -2, 0);
 
@@ -77,12 +77,8 @@ function addBullet(bullet) {
 	scene.add(bullet);
 }
 
-function createBulletField() {
+function createBulletField(blockSize, width, length) {
 	const origin = new THREE.Vector3(-60, 4, -40);
-
-	const blockSize = 10;
-	const width = 9;
-	const length = 9;
 
 	const numberOfBlocks = width * length;
 	// 10 to 30% filled
@@ -90,7 +86,7 @@ function createBulletField() {
 		0.1 * numberOfBlocks,
 		0.3 * numberOfBlocks
 	);
-	const visited = {};
+	let visited = {};
 
 	let i = 0;
 	while (i < numberOfBullets) {
@@ -115,11 +111,15 @@ function createScene() {
 
 function updateCameras() {
 	// Update ortographic camera
+	const a_ratio = 2;
+	const width = (a_ratio * 100 * 945) / window.innerHeight;
+	const height = (100 * 1920) / window.innerWidth;
+
 	Object.assign(cameras[0], {
-		left: window.innerWidth / -12,
-		right: window.innerWidth / 12,
-		top: window.innerHeight / 12,
-		bottom: window.innerHeight / -12,
+		left: -width / 2,
+		right: width / 2,
+		top: height / 2,
+		bottom: -height / 2,
 	});
 	// Update perspective camera
 	cameras[1].aspect = cameras[2].aspect =
