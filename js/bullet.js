@@ -17,8 +17,4 @@ export default class Bullet extends THREE.Object3D {
 		this.add(new THREE.Mesh(this.geometry, this.material));
 		this.position.set(x, y, z);
 	}
-
-	toggleAxes() {
-		this.axes.visible = !this.axes.visible;
-	}
 }
