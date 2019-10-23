@@ -52,7 +52,7 @@ function init() {
 	cannons[2] = createCannon(80, 0, 30);
 	selectCannon(0);
 
-	fence = createFence(-20, 9, 0);
+	fence = createFence(-21, 9, 0);
 	createBulletField(10, 9, 9);
 
 	window.addEventListener('keydown', onKeyDown);
