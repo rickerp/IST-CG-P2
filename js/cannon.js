@@ -16,11 +16,24 @@ export default class Cannon extends THREE.Object3D {
 
 	addBase(x, y, z) {
 		let geometry = new THREE.CubeGeometry(10, 2, 20);
-		let material = new THREE.MeshBasicMaterial({
+		let material = new THREE.MeshStandardMaterial({
 			wireframe: false,
 			color: 0x993e14,
 		});
 		let base = new THREE.Mesh(geometry, material);
+
+		let wheelGeo = new THREE.CylinderGeometry(5, 5, 2, 32);
+		let wheelMat = new THREE.MeshStandardMaterial({ color: 0x993e14 });
+
+		let lWheel = new THREE.Mesh(wheelGeo, wheelMat);
+		lWheel.rotateZ(Math.PI / 2);
+		let rWheel = lWheel.clone();
+
+		base.add(lWheel);
+		base.add(rWheel);
+
+		lWheel.position.x = 5 + 1;
+		rWheel.position.x = -(5 + 1);
 
 		base.position.set(x, y, z);
 		this.add(base);

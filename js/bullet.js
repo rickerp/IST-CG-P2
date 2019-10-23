@@ -2,13 +2,13 @@ import './three.js';
 
 export default class Bullet extends THREE.Object3D {
 	axes = new THREE.AxesHelper(10);
-	radius = 4;
+	radius = 3;
 	velocity = new THREE.Vector3();
 
 	constructor(x, y, z) {
 		super();
-		this.material = new THREE.MeshBasicMaterial({
-			color: 0x00ff00,
+		this.material = new THREE.MeshStandardMaterial({
+			color: 0x666666,
 			wireframe: false,
 		});
 
