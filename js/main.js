@@ -291,6 +291,11 @@ function handleCollisions(delta) {
 			let v1 = b1.velocity.clone();
 			let v2 = b2.velocity.clone();
 
+			// If positions are same, give tiny separation to solve collision
+			if (x1.equals(x2)) {
+				x1.addScalar(1e-10);
+			}
+
 			let a = v1.clone().sub(v2).dot(x1.clone().sub(x2));
 			let b = x1.clone().sub(x2).length() ** 2;
 			let c = x1.clone().sub(x2).multiplyScalar(-a/b);
