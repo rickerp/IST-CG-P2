@@ -8,6 +8,7 @@ var renderer = null;
 var scene = null;
 var keys = {};
 var lastTimestamp = 0;
+var light = null;
 
 var cameras = [];
 var cannons = [];
@@ -24,6 +25,7 @@ var followingCamera = false;
 
 var barrelRotationSpeed = 1.5;
 var sideRotation = 0;
+var shooted = false;
 
 function init() {
 	renderer = new THREE.WebGLRenderer({
@@ -38,7 +40,10 @@ function init() {
 	cameras[0] = createCamera(0, 100, 0, 0);
 	cameras[1] = createCamera(130, 20, 0, 1);
 	cameras[2] = createCamera(0, 0, 50, 1);
+
 	camera = cameras[0];
+
+	light.position.set(camera.position.x, camera.position.y, camera.position.z);
 
 	updateCameras();
 
@@ -47,28 +52,14 @@ function init() {
 	cannons[2] = createCannon(80, 0, 30);
 	selectCannon(0);
 
-	fence = createFence(-70, 10, 0);
+	fence = createFence(-21, 9, 0);
 	createBulletField(10, 9, 9);
-
-	createBase(-22, -2, 0);
 
 	window.addEventListener('keydown', onKeyDown);
 	window.addEventListener('keyup', onKeyUp);
 	window.addEventListener('resize', onResize);
 
 	animate(lastTimestamp);
-}
-
-function createBase(x, y, z) {
-	let geometry = new THREE.CubeGeometry(100, 4, 104);
-	let material = new THREE.MeshBasicMaterial({
-		wireframe: false,
-		color: 0xa4a4a4,
-	});
-	let base = new THREE.Mesh(geometry, material);
-
-	base.position.set(x, y, z);
-	scene.add(base);
 }
 
 function addBullet(bullet) {
@@ -106,6 +97,11 @@ function createBulletField(blockSize, width, length) {
 
 function createScene() {
 	scene = new THREE.Scene();
+	light = new THREE.SpotLight(0xffffff, 3);
+	light.target.position.set(0, 0, 0);
+
+	scene.add(light.target);
+	scene.add(light);
 	scene.add(new THREE.AxisHelper(10));
 }
 
@@ -206,6 +202,7 @@ function toggleBulletAxes() {
 
 function onKeyUp(e) {
 	keys[e.keyCode] = false;
+	shooted = false;
 }
 
 function onKeyDown(e) {
@@ -214,9 +211,19 @@ function onKeyDown(e) {
 	switch (e.keyCode) {
 		case 49: // 1 upper_camera
 			camera = cameras[0];
+			light.position.set(
+				camera.position.x,
+				camera.position.y,
+				camera.position.z
+			);
 			break;
 		case 50: // 2 perspective_camera
 			camera = cameras[1];
+			light.position.set(
+				camera.position.x,
+				camera.position.y,
+				camera.position.z
+			);
 			break;
 		case 51: // 3 ball_camera
 			if (bullets.length > 0) {
@@ -232,9 +239,6 @@ function onKeyDown(e) {
 			break;
 		case 69: // e
 			selectCannon(0);
-			break;
-		case 32: // space
-			shootBullet();
 			break;
 		case 82: // r
 			toggleBulletAxes();
@@ -340,10 +344,13 @@ function handleCollisions(delta) {
 
 function update(delta) {
 	let sideRotation = 0;
-	// left arrow
-	if (keys[37]) sideRotation += barrelRotationSpeed;
-	// right arrow
-	if (keys[39]) sideRotation -= barrelRotationSpeed;
+
+	if (keys[37]) sideRotation += barrelRotationSpeed; // left arrow
+	if (keys[39]) sideRotation -= barrelRotationSpeed; // right arrow
+	if (keys[32] && !shooted) {
+		shooted = true;
+		shootBullet();
+	}
 	handleCollisions(delta);
 	rotateSelectedCannon(sideRotation * delta);
 
