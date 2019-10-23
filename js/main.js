@@ -48,7 +48,7 @@ function init() {
 	selectCannon(0);
 
 	fence = createFence(-70, 10, 0);
-	createBulletField();
+	createBulletField(10, 9, 9);
 
 	createBase(-22, -2, 0);
 
@@ -77,12 +77,8 @@ function addBullet(bullet) {
 	scene.add(bullet);
 }
 
-function createBulletField() {
+function createBulletField(blockSize, width, length) {
 	const origin = new THREE.Vector3(-60, 4, -40);
-
-	const blockSize = 10;
-	const width = 9;
-	const length = 9;
 
 	const numberOfBlocks = width * length;
 	// 10 to 30% filled
@@ -90,7 +86,7 @@ function createBulletField() {
 		0.1 * numberOfBlocks,
 		0.3 * numberOfBlocks
 	);
-	const visited = {};
+	let visited = {};
 
 	let i = 0;
 	while (i < numberOfBullets) {
@@ -115,15 +111,40 @@ function createScene() {
 
 function updateCameras() {
 	// Update ortographic camera
+	const min_width = 100 * 2;
+	const min_height = 100;
+
+	// Calculate new possible values of width and height
+	let height = (window.innerHeight / window.innerWidth) * min_height;
+	let width = (window.innerWidth / window.innerHeight) * min_width;
+
+	// Height doesn't fit the screen
+	if (height < min_height) {
+		// Lock height
+		height = min_height;
+		// Adjust width
+		width = (window.innerWidth / window.innerHeight) * height;
+	}
+
+	// Width doesn't fit the screen
+	if (width < min_width) {
+		// Lock width
+		width = min_width;
+		// Adjust height
+		height = (window.innerHeight / window.innerWidth) * width;
+	}
+
 	Object.assign(cameras[0], {
-		left: window.innerWidth / -12,
-		right: window.innerWidth / 12,
-		top: window.innerHeight / 12,
-		bottom: window.innerHeight / -12,
+		left: -width / 2,
+		right: width / 2,
+		top: height / 2,
+		bottom: -height / 2,
 	});
+
 	// Update perspective camera
-	cameras[1].aspect = cameras[2].aspect =
-		window.innerWidth / window.innerHeight;
+
+	const new_ar = window.innerWidth / window.innerHeight;
+	cameras[1].aspect = cameras[2].aspect = new_ar;
 
 	cameras.forEach(camera => camera.updateProjectionMatrix());
 }
@@ -193,16 +214,13 @@ function onKeyDown(e) {
 	switch (e.keyCode) {
 		case 49: // 1 upper_camera
 			camera = cameras[0];
-			followingCamera = false;
 			break;
 		case 50: // 2 perspective_camera
 			camera = cameras[1];
-			followingCamera = false;
 			break;
 		case 51: // 3 ball_camera
 			if (bullets.length > 0) {
 				// if a ball exists
-				followingCamera = true;
 				camera = cameras[2];
 			}
 			break;
@@ -357,7 +375,7 @@ function update(delta) {
 		}
 	});
 
-	if (followingCamera) {
+	if (camera == cameras[2]) {
 		let lastBullet = bullets[bullets.length - 1];
 		let pos = lastBullet.position;
 		camera.position.set(pos.x + 50, pos.y + 50, pos.z);
