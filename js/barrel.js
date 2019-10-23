@@ -9,7 +9,6 @@ export default class Barrel extends THREE.Object3D {
 			metalness: 1,
 			roughness: 0.6,
 		});
-		console.log(this.material);
 		const height = options.height || 8;
 		const lenght = options.lenght || 20 + height / 2;
 
