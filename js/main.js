@@ -111,13 +111,28 @@ function createScene() {
 
 function updateCameras() {
 	// Update ortographic camera
-	const a_ratio = 2;
-	const width = (a_ratio * 100 * 945) / window.innerHeight;
-	const height = (100 * 1920) / window.innerWidth;
+	const min_width = 200;
+	const min_height = 120;
 
-	const new_ar = window.innerWidth / window.innerHeight;
-	const new_x = Math.pow(2 * 130, 1 / new_ar);
-	const new_y = Math.pow(2 * 20, 1 / new_ar);
+	// Calculate new possible values of width and height
+	let height = (window.innerHeight / window.innerWidth) * min_height;
+	let width = (window.innerWidth / window.innerHeight) * min_width;
+
+	// Height doesn't fit the screen
+	if (height < min_height) {
+		// Lock height
+		height = min_height;
+		// Adjust width
+		width = (window.innerWidth / window.innerHeight) * height;
+	}
+
+	// Width doesn't fit the screen
+	if (width < min_width) {
+		// Lock width
+		width = min_width;
+		// Adjust height
+		height = (window.innerHeight / window.innerWidth) * width;
+	}
 
 	Object.assign(cameras[0], {
 		left: -width / 2,
@@ -125,7 +140,12 @@ function updateCameras() {
 		top: height / 2,
 		bottom: -height / 2,
 	});
+
 	// Update perspective camera
+
+	const new_ar = window.innerWidth / window.innerHeight;
+	const new_x = Math.pow(2 * 130, 1 / new_ar);
+	const new_y = Math.pow(2 * 20, 1 / new_ar);
 
 	cameras[1].aspect = cameras[2].aspect = new_ar;
 
