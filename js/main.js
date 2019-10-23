@@ -111,8 +111,8 @@ function createScene() {
 
 function updateCameras() {
 	// Update ortographic camera
-	const min_width = 200;
-	const min_height = 120;
+	const min_width = 100 * 2;
+	const min_height = 100;
 
 	// Calculate new possible values of width and height
 	let height = (window.innerHeight / window.innerWidth) * min_height;
@@ -144,13 +144,7 @@ function updateCameras() {
 	// Update perspective camera
 
 	const new_ar = window.innerWidth / window.innerHeight;
-	const new_x = Math.pow(2 * 130, 1 / new_ar);
-	const new_y = Math.pow(2 * 20, 1 / new_ar);
-
 	cameras[1].aspect = cameras[2].aspect = new_ar;
-
-	cameras[1].position.x = Math.max(130, new_x);
-	cameras[1].position.y = Math.max(20, new_y);
 
 	cameras.forEach(camera => camera.updateProjectionMatrix());
 }
@@ -220,16 +214,13 @@ function onKeyDown(e) {
 	switch (e.keyCode) {
 		case 49: // 1 upper_camera
 			camera = cameras[0];
-			followingCamera = false;
 			break;
 		case 50: // 2 perspective_camera
 			camera = cameras[1];
-			followingCamera = false;
 			break;
 		case 51: // 3 ball_camera
 			if (bullets.length > 0) {
 				// if a ball exists
-				followingCamera = true;
 				camera = cameras[2];
 			}
 			break;
@@ -379,7 +370,7 @@ function update(delta) {
 		}
 	});
 
-	if (followingCamera) {
+	if (camera == cameras[2]) {
 		let lastBullet = bullets[bullets.length - 1];
 		let pos = lastBullet.position;
 		camera.position.set(pos.x + 50, pos.y + 50, pos.z);
