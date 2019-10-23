@@ -52,28 +52,14 @@ function init() {
 	cannons[2] = createCannon(80, 0, 30);
 	selectCannon(0);
 
-	fence = createFence(-70, 10, 0);
+	fence = createFence(-20, 9, 0);
 	createBulletField(10, 9, 9);
-
-	createBase(-22, -2, 0);
 
 	window.addEventListener('keydown', onKeyDown);
 	window.addEventListener('keyup', onKeyUp);
 	window.addEventListener('resize', onResize);
 
 	animate(lastTimestamp);
-}
-
-function createBase(x, y, z) {
-	let geometry = new THREE.CubeGeometry(100, 4, 104);
-	let material = new THREE.MeshBasicMaterial({
-		wireframe: false,
-		color: 0xa4a4a4,
-	});
-	let base = new THREE.Mesh(geometry, material);
-
-	base.position.set(x, y, z);
-	scene.add(base);
 }
 
 function addBullet(bullet) {
